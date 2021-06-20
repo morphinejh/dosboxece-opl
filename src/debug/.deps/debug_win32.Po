@@ -1,0 +1,6 @@
+debug_win32.o: debug_win32.cpp /usr/include/stdc-predef.h \
+ ../../include/dosbox.h ../../config.h ../../include/logging.h
+/usr/include/stdc-predef.h:
+../../include/dosbox.h:
+../../config.h:
+../../include/logging.h:
