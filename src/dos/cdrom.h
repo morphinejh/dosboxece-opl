@@ -146,7 +146,9 @@ private:
 		virtual Bit32u getRate() = 0;
 		virtual Bit8u  getChannels() = 0;
 		virtual int    getLength() = 0;
+		virtual void   setAudioPosition(uint32_t pos) = 0;
 		virtual        ~TrackFile() { };
+		uint32_t audio_pos = UINT32_MAX; // last position when playing audio
 		const Bit16u   chunkSize = 0;
 	};
 	
@@ -161,6 +163,7 @@ private:
 		Bit32u getRate() { return 44100; }
 		Bit8u  getChannels() { return 2; }
 		int    getLength();
+		void   setAudioPosition(uint32_t pos) { audio_pos = pos; }
 	private:
 		BinaryFile();
 		std::ifstream *file;
@@ -177,6 +180,7 @@ private:
 		Bit32u getRate();
 		Bit8u  getChannels();
 		int    getLength();
+		void   setAudioPosition(uint32_t pos) {}
 	private:
 		AudioFile();
 		Sound_Sample *sample;
