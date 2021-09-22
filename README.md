@@ -16,24 +16,24 @@ Future plans are to also incorporate the use of a FTDI - FT232H USB allowing for
 #### Reference Source code and/or insperation:
 
 * DosBox Enhanced Community Edition
- * https://yesterplay.net/dosboxece/
+  * https://yesterplay.net/dosboxece/
 * OPL2 Audio and OPL3 Duo! Source
- * https://github.com/DhrBaksteen/ArduinoOPL2
+  * https://github.com/DhrBaksteen/ArduinoOPL2
 * Munt MT-32 emulator
- * https://github.com/munt/munt
+  * https://github.com/munt/munt
 * FluidSynth - sound font synthesizer
- * https://github.com/FluidSynth/fluidsynth
+  * https://github.com/FluidSynth/fluidsynth
 * Dosbox-X Source
- * https://github.com/joncampbell123/dosbox-x
+  * https://github.com/joncampbell123/dosbox-x
 * Vincent Bernat's work with OPL2/OPL3LPT
- * https://github.com/vincentbernat/dosbox/branches
- * https://vincent.bernat.ch/en/blog/2018-opl2-audio-board
+  * https://github.com/vincentbernat/dosbox/branches
+  * https://vincent.bernat.ch/en/blog/2018-opl2-audio-board
  
 #### Reference Hardware:
 
 * OPL2LPT and OPL3LPT devices
- * https://www.serdashop.com/OPL2LPT
- * https://www.serdashop.com/OPL3LPT
+  * https://www.serdashop.com/OPL2LPT
+  * https://www.serdashop.com/OPL3LPT
 * OPL2 Audio and OPL3 Duo! audio devices
- * https://www.tindie.com/products/cheerful/opl2-audio-board/
- * https://www.tindie.com/products/cheerful/opl3-duo/
+  * https://www.tindie.com/products/cheerful/opl2-audio-board/
+  * https://www.tindie.com/products/cheerful/opl3-duo/
