@@ -1,12 +1,14 @@
 /**
- * For DosBoxECE-OPL OPL2Audio serial pass-through
+ * For DosBoxECE-OPL OPL3Duo! serial pass-through
  *
- *REQUIRES: Arduino OPL2 Library - https://github.com/DhrBaksteen/ArduinoOPL2
+ * REQUIRES: Arduino OPL2 Library - https://github.com/DhrBaksteen/ArduinoOPL2
  *
  * OPL2 board is connected as follows:
- * Pin  8 - Reset
- * Pin  9 - A0
- * Pin 10 - Latch
+ * Pin  6 - A2
+ * Pin  7 - A1
+ * Pin  8 - A0
+ * Pin  9 - /IC
+ * Pin 10 - /WR
  * Pin #  - Data    -MOSI of board being used (orignal Arduino Pin-11, ProMini Pin-16 )
  * Pin #  - Shift   -SCK of board being used (original Arduino Pin-13, ProMini Pin-15 )
  *
@@ -16,16 +18,16 @@
  */
 
 #include <SPI.h>
-#include <OPL2.h>
+#include <OPL3Duo.h>
 
 #define SerData Serial
 
-OPL2 opl2;
+OPL3Duo opl3Duo;
 byte state, reg, value, bank, x0, x1, x2;
 
 void setup() {
   Serial.begin(115200);
-  opl2.begin();
+  opl3Duo.begin();
   state=0;
 }
 
@@ -35,7 +37,7 @@ void loop() {
       case 0:
         x0=SerData.read();
         if(x0 & 0x80){
-          state=1;  
+          state=1;
         }
         else {
           state=0;
@@ -47,10 +49,10 @@ void loop() {
         break;
       case 2:
         x2= SerData.read();
-        //bank = x0>>2; //Not needed for OPL2, only OPL3Duo!
+        bank = x0>>2;
         reg = ((x0 & 0x03) << 6) | ((x1 & 0x7E) >> 1);
         value = ((x1 & 0x01) << 7) | (x2 & 0x7F);
-        opl2.write(reg, value);
+        opl3Duo.write(bank, reg, value);
         state=0;
         break;
       default:
