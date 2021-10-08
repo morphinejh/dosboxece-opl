@@ -19,6 +19,7 @@
 #include <ieee1284.h>
 #include <math.h>
 #include <unistd.h>
+#include <chrono>
 
 #include "adlib.h"
 #include "dosbox.h"
@@ -27,13 +28,14 @@
 
 #define C_DEBUG 0
 #define byte uint8_t
-
+   
 #define PP_NOT_STROBE   0x1
 #define PP_NOT_AUTOFD   0x2
 #define PP_INIT         0x4
 #define PP_NOT_SELECT   0x8
 
 uint16_t lastAddr=0;
+bool opl2mode = true;
 
 const uint8_t a0_0 = PP_NOT_SELECT | PP_NOT_STROBE | PP_INIT;
 const uint8_t a0_1 = PP_NOT_SELECT | PP_NOT_STROBE; //No PP_INIT means write something.
@@ -46,7 +48,7 @@ const uint8_t a1_2 = PP_NOT_STROBE | PP_INIT;
 const uint8_t d_0  = PP_NOT_SELECT | PP_INIT;
 const uint8_t d_1  = PP_NOT_SELECT;
 const uint8_t d_2  = PP_NOT_SELECT | PP_INIT;
-	
+
 #if C_OPL2LPT
 
 static void opl2lpt_shutdown(struct parport *pport) {
@@ -60,9 +62,24 @@ static void opl2lpt_lpt_write(struct parport *pport, Bit16u addr, Bit8u data){
 #if C_DEBUG
 		LOG_MSG("--direct----    Addr 0x%" PRIx16 ", data 0x%" PRIx8, addr, data);
 #endif
-	
+
+	auto start = std::chrono::high_resolution_clock::now();
 	//Only need to change A1 for writing >0xff address, not data.
 	ieee1284_write_data(pport, addr);
+	
+	//Strictly enforce 4us wait time for OPL2 without sleeping thread.
+	if (opl2mode) {
+		auto count = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start);
+		while( count.count()<4 ){
+			count = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start);
+		}
+	}
+	auto end = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+#if C_DEBUG
+	LOG_MSG(" Elapsed addr microseconds: %d", duration.count() );
+#endif
+	
 	if (addr < 0x100) {
 		//Register Address for OPL2
 		ieee1284_write_control(pport, a0_0 ^ C1284_INVERTED);
@@ -75,10 +92,26 @@ static void opl2lpt_lpt_write(struct parport *pport, Bit16u addr, Bit8u data){
 		ieee1284_write_control(pport, a1_2 ^ C1284_INVERTED);
 	}
 
+	start = std::chrono::high_resolution_clock::now();
+
 	ieee1284_write_data(pport, data);
 	ieee1284_write_control(pport, d_0 ^ C1284_INVERTED);
 	ieee1284_write_control(pport, d_1 ^ C1284_INVERTED);
 	ieee1284_write_control(pport, d_2 ^ C1284_INVERTED);
+
+	//Strictly enforce 23us wait time for OPL2 without sleeping thread.
+	if (opl2mode) {
+		auto count = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start);
+		while( count.count()<23 ){
+			count = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start);
+		}
+	}
+	end = std::chrono::high_resolution_clock::now();
+	duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+#if C_DEBUG
+	LOG_MSG(" Elapsed data microseconds: %d", duration.count() );
+#endif
+
 }
 
 static void opl2lpt_reset(struct parport *pport, Adlib::Mode mode) {
@@ -87,6 +120,7 @@ static void opl2lpt_reset(struct parport *pport, Adlib::Mode mode) {
 		opl2lpt_lpt_write(pport, i, 0);
 	}
 	if (mode == Adlib::MODE_OPL3) {
+		opl2mode=false;
 		for (int i = 256; i < 512; i ++) {
 			opl2lpt_lpt_write(pport, i, 0);
 		}
@@ -177,7 +211,7 @@ namespace OPL2LPT {
 		Bit32u event;
 		Bit16u addr;
 		Bit8u data;
-		
+
 		while (true) {
 			SDL_LockMutex(lock);
 			while (eventQueue.empty()) {
