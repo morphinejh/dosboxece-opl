@@ -55,8 +55,8 @@ void loop() {
         reg = ((x0 & 0x03) << 6) | ((x1 & 0x7E) >> 1);
         value = ((x1 & 0x01) << 7) | (x2 & 0x7F);
         //opl2.write(reg, value);
-        //sendOPL(reg, value);
-        fastSendOPL(reg, value);
+        sendOPL(reg, value);
+        //fastSendOPL(reg, value);
         state=0;
         break;
       default:
