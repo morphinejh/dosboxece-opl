@@ -10,7 +10,7 @@ extern "C"{
 #ifndef OPL3_DUO_BOARD
     #define OPL3_DUO_BOARD
 	// Output debug information to the DosBox console if set to 1
-	#define OPL3_DUO_BOARD_DEBUG 1
+	#define OPL3_DUO_BOARD_DEBUG 0
 
 	class Opl3DuoBoard {
 		public:
