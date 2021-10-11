@@ -13,12 +13,6 @@ extern size_t commPortwrite(int* fd, const void *buf, size_t count);
 int readPort(int* serial_port);
 }
 
-Opl3DuoBoard::Opl3DuoBoard() {
-	goodComm=false;
-	lock=SDL_CreateMutex();
-	cond=SDL_CreateCond();
-}
-
 Opl3DuoBoard::~Opl3DuoBoard(){
 		SDL_LockMutex(lock);
 		SDL_CondSignal(cond);
@@ -26,6 +20,12 @@ Opl3DuoBoard::~Opl3DuoBoard(){
 		//Thread already completed before destructor. See disconnect()
 		SDL_DestroyCond(cond);
 		SDL_DestroyMutex(lock);
+}
+
+Opl3DuoBoard::Opl3DuoBoard() {
+	goodComm=false;
+	lock=SDL_CreateMutex();
+	cond=SDL_CreateCond();
 }
 
 void Opl3DuoBoard::connect(const char* port, long unsigned int* oplbaud) {
@@ -94,21 +94,16 @@ void Opl3DuoBoard::write(uint32_t reg, uint8_t val) {
 		Byte0	1	0	0	0	A9	A8	A7	A6
 		Byte1	0	A5	A4	A3	A2	A1	A0	D7
 		Byte2	0	D6	D5	D4	D3	D2	D1	D0
-		*Adapted for OPL2 only - see OPL3DuoAudio.cpp for OPL3
 		*/
-		
+
 		//For OPL3 need to set bit A8 and|or A9.
 		//A8 determines the bank of the OPL3 chip. For OPL2 this bit is always 0.
 		//A9 determines the synth unit of the OPL3 Duo. 0 addresses the left chip, 1 addresses the right chip.
-		
-		//bytes[0] = (lastRegAddr >> 6) & 0x7;
-		//bytes[0] |= 0x80;
+		//support for SoundBlaster PRO 1 through single OPL3 chip.
 		bytes[0] = (reg >> 6) & 0x07;
 		bytes[0]|= 0x80;
 		bytes[1]= (((reg & 0x3f) << 1) | (val >> 7)) & 0x7F;
 		bytes[2]= (val & 0x7f);
-		//bytes[1]= (((lastRegAddr & 0x3f) << 1) | (val >> 7)) & 0x7F;
-		//bytes[2]= (val & 0x7f);
 		//Format:
 		//[0x00 - 0x00 -	0x00	-	0x00]
 		//[EXIT - A9-6 -	A5-0D7	-	D6-0]
@@ -121,12 +116,14 @@ void Opl3DuoBoard::write(uint32_t reg, uint8_t val) {
 		
 		SDL_LockMutex(lock);
 		eventQueue.push(regVal32);
-		//printf("Pushed: 0x%.2X, 0x%.2X | 0x%.4X, 0x%.4X, 0x%.4X\n", reg, val, bytes[0],bytes[1], bytes[2]);
+		#if OPL3_DUO_BOARD_DEBUG
+			printf("Pushed: 0x%.2X, 0x%.2X | 0x%.4X, 0x%.4X, 0x%.4X\n", reg, val, bytes[0],bytes[1], bytes[2]);
+		#endif
 		SDL_CondSignal(cond);
 		SDL_UnlockMutex(lock);
 
-		#if OPL2_AUDIO_BOARD_DEBUG
-			printf("OPL3Duo Audio Board: Write %d --> %d\n", val, reg);
+		#if OPL3_DUO_BOARD_DEBUG
+			printf("OPL3Duo Audio Board: Write %d --> 0x%.4X\n", val, reg);
 		#endif
 	}
 }
@@ -151,7 +148,6 @@ int Opl3DuoBoard::serial_write(){
 			bytes[0]=0x000000FF&event;
 			bytes[1]=0x000000FF&(event>>8);
 			bytes[2]=0x000000FF&(event>>16);
-			//printf("Popped: 0x%.4X, 0x%.4X, 0x%.4X\n", bytes[0],bytes[1], bytes[2]);
 			commPortwrite(&fd, (const void*)bytes, sizeof(bytes)),sizeof(bytes);
 			tcdrain(fd);
 		}

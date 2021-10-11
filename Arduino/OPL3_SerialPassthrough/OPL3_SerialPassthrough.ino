@@ -18,8 +18,9 @@
  */
 
 //Optimize for speed over size
-#pragma GCC optimize ("-O2")
+#pragma GCC optimize ("O2")
 #pragma GCC push_options
+
 
 #include <SPI.h>
 #include <OPL3Duo.h>
@@ -67,9 +68,9 @@ void loop() {
         break;
       case 2:
         x2= SerData.read();
-        bank = x0>>2;
-        reg = ((x0 & 0x03) << 6) | ((x1 & 0x7E) >> 1);
-        value = ((x1 & 0x01) << 7) | (x2 & 0x7F);
+        bank  = ( x0 & 0x0C ) >> 2;
+        reg   = ( (x0 & 0x03) << 6) | ( (x1 & 0x7E) >> 1);
+        value = ( (x1 & 0x01) << 7) | (x2 & 0x7F);
         /*sendOPL averages ~37us to complete*/
         sendOPL(bank, reg, value);
         /*fastSendOPL averages ~7us to complete but is hardware dependent*/

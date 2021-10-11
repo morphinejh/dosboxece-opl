@@ -4,13 +4,11 @@ extern "C"{
 
 #include <queue>
 #include "SDL_thread.h"
-#include "dosbox.h"
 
 #define EXIT_CODE 0xFF000000
 
 #ifndef OPL2_AUDIO_BOARD
 	#define OPL2_AUDIO_BOARD
-
 	// Output debug information to the DosBox console if set to 1
 	#define OPL2_AUDIO_BOARD_DEBUG 0
 
@@ -25,15 +23,10 @@ extern "C"{
 			~OPL2AudioBoard();
 			
 		private:
-		
-			//TODO: Remove comport
-			//COMPORT comport;
-			//File descriptor
 			termios old_tty;
 			int fd;
 			bool goodComm;
 			/* Serial write function for thread */
-			//Thread management for OPL2LPT
 			SDL_Thread *thread;
 			SDL_mutex *lock;
 			SDL_cond *cond;

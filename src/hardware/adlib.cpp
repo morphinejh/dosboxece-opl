@@ -251,18 +251,20 @@ namespace OPL3DUOBOARD {
 		virtual uint32_t WriteAddr(uint32_t port, uint8_t val) {
 			uint32_t reg = val;
 
+			
 			/*
 			The data is serial and we need to get it in parallel format. Port+Address,
 			then RegisterAddress+Data ...the current address is a port number,
 			its data value is the address we want to remember. Certain port numbers
 			mean RegisterAddresses is above 0xFF in YMF262.
-			*/
+			
 			//Adlib Gold and Soundblaster 16 YMF262 ports "Advanced FM"
 			if( port==0x38a || port==0x222 || port==0x242 || port==0x262 || port==0x282)
 				opl3DuoBoard.lastRegAddr = 0x100|val;
 			else
 				opl3DuoBoard.lastRegAddr = val;
-
+			*/
+			
 			if ((port&3)!=0) {
 				reg |= 0x100;
 			}
@@ -947,35 +949,52 @@ Module::Module( Section* configuration ) : Module_base(configuration) {
 	}
 	
 	else if (oplemu == "opl2board") {
-		oplmode = OPL_opl2;
-		handler = new OPL2BOARD::Handler(oplport.c_str(), &opl_baud);
+		if (oplmode == OPL_opl2) {
+			handler = new OPL2BOARD::Handler(oplport.c_str(), &opl_baud);
+		} else {
+			LOG_MSG("Incorrectly configured mode for Opl2Audio Board , must be OPL2.");
+			handler = new DBOPL::Handler();
+		}
 	}
 	else if (oplemu == "opl3duoboard") {
-		oplmode = OPL_opl3;
-		handler = new OPL3DUOBOARD::Handler(oplport.c_str(),&opl_baud);
+		if (oplmode == OPL_opl2 || oplmode == OPL_opl3 || oplmode == OPL_dualopl2) {
+			handler = new OPL3DUOBOARD::Handler(oplport.c_str(),&opl_baud);
+			if(oplmode == OPL_dualopl2){
+				//Must enable OPL3 in this mode as no software will do it in DOS
+				handler->WriteReg( 0x00000105, 0x01);
+			}
+		} else {
+			LOG_MSG("Incorrectly configured mode for Opl2Audio Board , must be OPL2 or OPL3.");
+			handler = new DBOPL::Handler();
+		}
 	}
 	    
 	#if C_OPL2LPT
 	else if (oplemu == "opl2lpt") {
 		if (oplmode == OPL_opl2) {
-			std::string opl2lptport(oplport.c_str());
-			handler = new OPL2LPT::Handler(opl2lptport, Adlib::MODE_OPL2);
+			handler = new OPL2LPT::Handler(oplport.c_str(), Adlib::MODE_OPL2);
 		} else {
+			LOG_MSG("Incorrectly configured mode for OPL2LPT, must be OPL2.");
 			handler = new DBOPL::Handler();
 		}
 	}
 	else if (oplemu == "opl3lpt") {
-		//TODO: Make this work better, force OPL3 mode for now.
-		oplmode = OPL_opl3;
-		if (oplmode == OPL_opl3) {
-			// We don't handle OPL2 with OPL3LPT (mostly
-			// to not have an additional variable for the
-			// kind of physical chip we drive).
-			std::string opl2lptport(oplport.c_str());
-			handler = new OPL2LPT::Handler(opl2lptport, Adlib::MODE_OPL3);
-		}
-		else {
-			handler = new DBOPL::Handler();
+		switch(oplmode){
+			case (OPL_opl2):
+				handler = new OPL2LPT::Handler(oplport.c_str(), Adlib::MODE_OPL2);
+				break;
+			case (OPL_dualopl2):
+			case (OPL_opl3):
+				handler = new OPL2LPT::Handler(oplport.c_str(), Adlib::MODE_OPL3);
+				if(oplmode == OPL_dualopl2){
+					//Must enable OPL3 in this mode as no software will do it in DOS
+					handler->WriteReg( 0x00000105, 0x01);
+				}
+				break;
+			default:
+				LOG_MSG("Incorrectly configured mode for OPL3LPT, must be OPL2 or OPL3.");
+				handler = new DBOPL::Handler();
+				break;				
 		}
 	}
 	#endif

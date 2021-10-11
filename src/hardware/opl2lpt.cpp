@@ -74,9 +74,10 @@ static void opl2lpt_lpt_write(struct parport *pport, Bit16u addr, Bit8u data){
 			count = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start);
 		}
 	}
+
+#if C_DEBUG
 	auto end = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-#if C_DEBUG
 	LOG_MSG(" Elapsed addr microseconds: %d", duration.count() );
 #endif
 	
@@ -106,16 +107,16 @@ static void opl2lpt_lpt_write(struct parport *pport, Bit16u addr, Bit8u data){
 			count = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start);
 		}
 	}
+#if C_DEBUG
 	end = std::chrono::high_resolution_clock::now();
 	duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-#if C_DEBUG
 	LOG_MSG(" Elapsed data microseconds: %d", duration.count() );
 #endif
 
 }
 
 static void opl2lpt_reset(struct parport *pport, Adlib::Mode mode) {
-	LOG_MSG("OPL2LPT: reset %s chip", mode == Adlib::MODE_OPL2 ? "OPL2" : "OPL3");
+	LOG_MSG("%sLPT: chip reset", mode == Adlib::MODE_OPL2 ? "OPL2" : "OPL3");
 	for (int i = 0; i < 256; i ++) {
 		opl2lpt_lpt_write(pport, i, 0);
 	}
@@ -131,11 +132,12 @@ static struct parport *opl2lpt_init(std::string name, Adlib::Mode mode) {
 	struct parport_list parports = {};
 	struct parport *pport;
 
-	LOG_MSG("OPL2LPT: name given: %s", name.c_str());
+	LOG_MSG("%sLPT name provided: %s", mode == Adlib::MODE_OPL2 ? "OPL2" : "OPL3", name.c_str());
 
 	// Look for available parallel ports
 	if (ieee1284_find_ports(&parports, 0) != E1284_OK) {
-		LOG_MSG("OPL2LPT: cannot find parallel ports");
+		LOG_MSG("%sLPT: cannot find parallel ports",mode == Adlib::MODE_OPL2 ? "OPL2" : "OPL3");
+		
 		return nullptr;
 	}
 	
@@ -144,21 +146,22 @@ static struct parport *opl2lpt_init(std::string name, Adlib::Mode mode) {
 			int caps = CAP1284_RAW;
 			pport = parports.portv[i];
 			if (ieee1284_open(pport, 0, &caps) != E1284_OK) {
-				LOG_MSG("OPL2LPT: cannot open parallel port %s", pport->name);
+				LOG_MSG("%sLPT: cannot open parallel port %s", mode == Adlib::MODE_OPL2 ? "OPL2" : "OPL3", pport->name);
 			}
 			if (ieee1284_claim(pport) != E1284_OK) {
-				LOG_MSG("OPL2LPT: cannot claim parallel port %s", pport->name);
+				LOG_MSG("%sLPT: cannot claim parallel port %s", mode == Adlib::MODE_OPL2 ? "OPL2" : "OPL3", pport->name);
 				ieee1284_close(pport);
 				continue;
 			}
 			opl2lpt_reset(pport, mode);
-			LOG_MSG("OPL2LPT: found parallel port: %s", pport->name);
+			LOG_MSG("%sLPT: found parallel port: %s", mode == Adlib::MODE_OPL2 ? "OPL2" : "OPL3",pport->name);
+
 			ieee1284_free_ports(&parports);
 			return pport;
 		}
 	}
 	ieee1284_free_ports(&parports);
-	LOG_MSG("OPL2LPT: cannot find parallel port %s", name.c_str());
+	LOG_MSG("%sLPT: cannot find parallel port %s", mode == Adlib::MODE_OPL2 ? "OPL2" : "OPL3",name.c_str());
 	return nullptr;
 }
 
@@ -222,7 +225,7 @@ namespace OPL2LPT {
 			SDL_UnlockMutex(lock);
 
 			if ((event & 0x80000000) == EventQuit) {
-				LOG_MSG("OPL2LPT: quit sound thread");
+				LOG_MSG("%sLPT: quit sound thread",mode == Adlib::MODE_OPL2 ? "OPL2" : "OPL3");
 				break;
 			}
 			
@@ -234,8 +237,9 @@ namespace OPL2LPT {
 				opl2lpt_lpt_write(pport, addr, data);
 				break;
 			case EventAddr:
+				//Not used at this time.
 			default:
-				LOG_MSG("OPL2LPT: got unknown event 0x%" PRIx16, event);
+				LOG_MSG("OPL-LPT: got unknown event 0x%" PRIx16, event);
 			}
 		}
 
@@ -249,12 +253,12 @@ namespace OPL2LPT {
 	void Handler::Init(Bitu rate) {
 		thread = SDL_CreateThread(opl2lpt_thread, this);
 		if (!thread) {
-			LOG_MSG("OPL2LPT: unable to create thread: %s", SDL_GetError());
+			LOG_MSG("%sLPT: unable to create thread: %s", mode == Adlib::MODE_OPL2 ? "OPL2" : "OPL3", SDL_GetError());
 		}
 	}
 
 	Handler::Handler(std::string name, Adlib::Mode mode) : pportName(name), mode(mode), lock(SDL_CreateMutex()), cond(SDL_CreateCond()) {
-		LOG_MSG("OPL2LPT: name passed: %s", name.c_str());
+
 	}
 
 	Handler::~Handler() {
