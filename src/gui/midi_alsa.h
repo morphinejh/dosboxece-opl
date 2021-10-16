@@ -25,6 +25,8 @@
 #include <sstream>
 #define ADDR_DELIM	".:"
 
+#include <iostream>
+
 #if ((SND_LIB_MINOR >= 6) && (SND_LIB_MAJOR == 0)) || (SND_LIB_MAJOR >= 1)
 #define snd_seq_flush_output(x) snd_seq_drain_output(x)
 #define snd_seq_set_client_group(x,name)	/*nop */
@@ -119,8 +121,10 @@ public:
 		default:
 			//Maybe filter out FC as it leads for at least one user to crash, but the entire midi stream has not yet been checked.
 			LOG(LOG_MISC,LOG_WARN)("ALSA:Unknown Command: %02X %02X %02X", msg[0],msg[1],msg[2]);
-			send_event(1);
-			break;
+			std::cout<<std::hex<<(int)msg[0]<<", "<<(int)msg[1]<<", "<<(int)msg[2]<<std::endl;
+			//TODO: Figure out how to handle real time messages in ALSA.
+			//(segmentation fault otherwise)
+			//send_event(1);
 		}
 	}	
 
