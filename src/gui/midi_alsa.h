@@ -38,6 +38,7 @@
 
 class MidiHandler_alsa : public MidiHandler {
 private:
+	snd_midi_event_t *midi_event;
 	snd_seq_event_t ev;
 	snd_seq_t *seq_handle;
 	int seq_client, seq_port;
@@ -118,13 +119,23 @@ public:
 				send_event(1);
 			}
 			break;
+		case 0xF0:
+			if(msg[0]>=0xF8){
+				/* Handle real-time messages in ALSA properly.
+				 * send_event(1); //creates a segmentation fault
+				 * real-time event handling adapted form `alsa-lib/test/lsb/midi_event.c`
+				 * 
+				 * MIDI Standard real-time messages are only 1-byte long of data.
+				 */
+				snd_midi_event_new(256 /* ? */, &midi_event);
+				snd_midi_event_encode(midi_event, msg, 1, &ev);
+				snd_midi_event_free(midi_event);
+			}
+			break;			
 		default:
 			//Maybe filter out FC as it leads for at least one user to crash, but the entire midi stream has not yet been checked.
 			LOG(LOG_MISC,LOG_WARN)("ALSA:Unknown Command: %02X %02X %02X", msg[0],msg[1],msg[2]);
-			std::cout<<std::hex<<(int)msg[0]<<", "<<(int)msg[1]<<", "<<(int)msg[2]<<std::endl;
-			//TODO: Figure out how to handle real time messages in ALSA.
-			//(segmentation fault otherwise)
-			//send_event(1);
+			send_event(1);
 		}
 	}	
 
