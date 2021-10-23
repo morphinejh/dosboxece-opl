@@ -729,7 +729,7 @@ void DOSBOX_Init(void) {
 	
 	Pstring = secprop->Add_string("oplport", Property::Changeable::OnlyAtStart, "");
 	Pstring->Set_help(
-		"Parallel or Serial port of the OPL2/3 Audio Board only\n"
+		"Parallel or Serial port of the OPL2/3 audio board only\n"
 		"Examples: ttyACM0, ttyS0, parport0, etc\n"
 		"only valid if oplemu=opl2board, opl3duo, opl2lpt, opl3lpt\n"
 		"When any opl2 only device is selected, opl2mode is\n"

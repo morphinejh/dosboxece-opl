@@ -129,6 +129,7 @@ struct Handler : public Adlib::Handler {
 
 }
 
+
 namespace MAMEOPL3 {
 
 struct Handler : public Adlib::Handler {
@@ -286,6 +287,7 @@ namespace OPL3DUOBOARD {
 }
 
 #define RAW_SIZE 1024
+
 
 /*
 	Main Adlib implementation
