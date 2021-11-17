@@ -121,7 +121,7 @@ public:
 			if(msg[0]>=0xF8){
 				/* Handle real-time messages in ALSA properly.
 				 * send_event(1); //creates a segmentation fault
-				 * real-time event handling adapted form `alsa-lib/test/lsb/midi_event.c`
+				 * real-time event handling adapted from `alsa-lib/test/lsb/midi_event.c`
 				 * 
 				 * MIDI Standard real-time messages are only 1-byte long of data.
 				 */
