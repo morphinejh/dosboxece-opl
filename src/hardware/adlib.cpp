@@ -715,7 +715,8 @@ void Module::PortWrite( Bitu port, Bitu val, Bitu /*iolen*/ ) {
 			}
 			break;
 		}
-	} else {
+	}
+	else {
 		//Ask the handler to write the address
 		//Make sure to clip them in the right range
 		switch ( mode ) {
@@ -929,9 +930,7 @@ Module::Module( Section* configuration ) : Module_base(configuration) {
 	float scale = ((float)strength)/100.0;
 	mixerChan->SetScale( scale );
 
-	if (oplemu == "fast") {
-		handler = new DBOPL::Handler();
-	} else if (oplemu == "compat") {
+	if (oplemu == "compat") {
 		if ( oplmode == OPL_opl2 ) {
 			handler = new OPL2::Handler();
 		} else {
@@ -955,7 +954,7 @@ Module::Module( Section* configuration ) : Module_base(configuration) {
 			handler = new OPL2BOARD::Handler(oplport.c_str(), &opl_baud);
 		} else {
 			LOG_MSG("Incorrectly configured mode for Opl2Audio Board , must be OPL2.");
-			handler = new DBOPL::Handler();
+			handler = new OPL2::Handler();
 		}
 	}
 	else if (oplemu == "opl3duoboard") {
@@ -967,7 +966,7 @@ Module::Module( Section* configuration ) : Module_base(configuration) {
 			}
 		} else {
 			LOG_MSG("Incorrectly configured mode for Opl2Audio Board , must be OPL2 or OPL3.");
-			handler = new DBOPL::Handler();
+			handler = new OPL3::Handler();
 		}
 	}
 	    
@@ -977,7 +976,7 @@ Module::Module( Section* configuration ) : Module_base(configuration) {
 			handler = new OPL2LPT::Handler(oplport.c_str(), Adlib::MODE_OPL2);
 		} else {
 			LOG_MSG("Incorrectly configured mode for OPL2LPT, must be OPL2.");
-			handler = new DBOPL::Handler();
+			handler = new OPL2::Handler();
 		}
 	}
 	else if (oplemu == "opl3lpt") {
@@ -995,14 +994,15 @@ Module::Module( Section* configuration ) : Module_base(configuration) {
 				break;
 			default:
 				LOG_MSG("Incorrectly configured mode for OPL3LPT, must be OPL2 or OPL3.");
-				handler = new DBOPL::Handler();
+				handler = new OPL3::Handler();
 				break;				
 		}
 	}
 	#endif
-	
-	else {
-		handler = new DBOPL::Handler();
+	//Fall back to dbop, will also catch auto
+	else if (oplemu == "fast" || 1) {
+		const bool opl3Mode = oplmode >= OPL_opl3;
+		handler = new DBOPL::Handler( opl3Mode );
 	}
 	handler->Init( rate );
 	bool single = false;
