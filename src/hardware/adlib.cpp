@@ -715,8 +715,7 @@ void Module::PortWrite( Bitu port, Bitu val, Bitu /*iolen*/ ) {
 			}
 			break;
 		}
-	}
-	else {
+	} else {
 		//Ask the handler to write the address
 		//Make sure to clip them in the right range
 		switch ( mode ) {
