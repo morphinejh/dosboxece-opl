@@ -117,7 +117,7 @@ public:
 				send_event(1);
 			}
 			break;
-		case 0xF0:
+		default:
 			if(msg[0]>=0xF8){
 				/* Handle real-time messages in ALSA properly.
 				 * send_event(1); //creates a segmentation fault
@@ -129,11 +129,12 @@ public:
 				snd_midi_event_encode(midi_event, msg, 1, &ev);
 				snd_midi_event_free(midi_event);
 			}
-			break;			
-		default:
-			//Maybe filter out FC as it leads for at least one user to crash, but the entire midi stream has not yet been checked.
-			LOG(LOG_MISC,LOG_WARN)("ALSA:Unknown Command: %02X %02X %02X", msg[0],msg[1],msg[2]);
-			send_event(1);
+			else {
+				//Maybe filter out FC as it leads for at least one user to crash, but the entire midi stream has not yet been checked.
+				LOG(LOG_MISC,LOG_WARN)("ALSA:Unknown Command: %02X %02X %02X", msg[0],msg[1],msg[2]);
+				send_event(1);			
+			}
+			break;
 		}
 	}	
 
