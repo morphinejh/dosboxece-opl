@@ -31,8 +31,6 @@ Future plans are to also incorporate the use of a FTDI - FT232H USB allowing for
 * Vincent Bernat's work with OPL2/OPL3LPT
   * https://github.com/vincentbernat/dosbox/branches
   * https://vincent.bernat.ch/en/blog/2018-opl2-audio-board
-* Voyageur's OpenGLIDE mirror
-  * https://github.com/voyageur/openglide
 * tio - Simple TTY terminal
   * https://github.com/tio/tio
  
