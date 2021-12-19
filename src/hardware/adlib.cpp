@@ -169,7 +169,7 @@ struct Handler : public Adlib::Handler {
 };
 
 }
-
+ 
 namespace NukedOPL {
 struct Handler : public Adlib::Handler {
 	opl3_chip chip;
@@ -943,7 +943,7 @@ Module::Module( Section* configuration ) : Module_base(configuration) {
 		else {
 			handler = new MAMEOPL3::Handler();
 		}
-	}
+	} 
 	else if (oplemu == "nuked") {
 		handler = new NukedOPL::Handler();
 	}

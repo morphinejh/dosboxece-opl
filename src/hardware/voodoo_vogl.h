@@ -20,6 +20,10 @@
 #ifndef DOSBOX_VOODOO_VOGL_H
 #define DOSBOX_VOODOO_VOGL_H
 
+#ifndef DOSBOX_DOSBOX_H
+#include "dosbox.h"
+#endif
+
 #include "SDL.h"
 #ifndef _WIN32
 	#define GL_ARB_multitexture
@@ -30,7 +34,6 @@
 #endif
 #include "SDL_opengl.h"
 
-typedef Bit32s INT32;
 
 /* opengl extensions */
 extern PFNGLACTIVETEXTUREARBPROC glActiveTextureARB;
@@ -43,7 +46,6 @@ extern PFNGLCREATEPROGRAMOBJECTARBPROC glCreateProgramObjectARB;
 extern PFNGLATTACHOBJECTARBPROC glAttachObjectARB;
 extern PFNGLLINKPROGRAMARBPROC glLinkProgramARB;
 extern PFNGLUSEPROGRAMOBJECTARBPROC glUseProgramObjectARB;
-extern PFNGLDELETEPROGRAMPROC glDeleteProgram;
 extern PFNGLUNIFORM1IARBPROC glUniform1iARB;
 extern PFNGLUNIFORM1FARBPROC glUniform1fARB;
 extern PFNGLUNIFORM2FARBPROC glUniform2fARB;
@@ -54,10 +56,10 @@ extern PFNGLDETACHOBJECTARBPROC glDetachObjectARB;
 extern PFNGLDELETEOBJECTARBPROC glDeleteObjectARB;
 extern PFNGLGETOBJECTPARAMETERIVARBPROC glGetObjectParameterivARB;
 extern PFNGLGETINFOLOGARBPROC glGetInfoLogARB;
-extern PFNGLBLENDFUNCSEPARATEPROC glBlendFuncSeparate;
-extern PFNGLGENERATEMIPMAPEXTPROC glGenerateMipmap;
+extern PFNGLBLENDFUNCSEPARATEEXTPROC glBlendFuncSeparateEXT;
+extern PFNGLGENERATEMIPMAPEXTPROC glGenerateMipmapEXT;
 extern PFNGLGETATTRIBLOCATIONARBPROC glGetAttribLocationARB;
-extern PFNGLVERTEXATTRIB1FPROC glVertexAttrib1fARB;
+extern PFNGLVERTEXATTRIB1FARBPROC glVertexAttrib1fARB;
 
 
 #define VOGL_ATLEAST_V20			0x00000001

@@ -1,5 +1,5 @@
  /*
- *  Copyright (C) 2002-2013  The DOSBox Team
+ *  Copyright (C) 2002-2011  The DOSBox Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -50,5 +50,9 @@ extern void Voodoo_Output_Enable(bool enabled);
 extern bool Voodoo_GetRetrace();
 extern double Voodoo_GetVRetracePosition();
 extern double Voodoo_GetHRetracePosition();
+
+
+//extern void CPU_Core_Dyn_X86_SaveDHFPUState(void);
+//extern void CPU_Core_Dyn_X86_RestoreDHFPUState(void);
 
 #endif

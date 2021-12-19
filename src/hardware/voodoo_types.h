@@ -53,14 +53,14 @@ typedef Bit8s 						INT8;
 typedef Bit16u						UINT16;
 typedef Bit16s						INT16;
 
-#ifndef _WINDOWS_
-#define TRUE	1
-#define FALSE	0
 /* 32-bit values */
+#ifndef _WINDOWS_
 typedef Bit32u						UINT32;
 typedef Bit32s						INT32;
+#endif
 
 /* 64-bit values */
+#ifndef _WINDOWS_
 typedef Bit64u						UINT64;
 typedef Bit64s						INT64;
 #endif

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2002-2013  The DOSBox Team
+ *  Copyright (C) 2002-2011  The DOSBox Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@
 
 #if C_OPENGL
 
-#include "voodoo_types.h"
 #include "voodoo_vogl.h"
 
 
@@ -39,7 +38,6 @@ PFNGLCREATEPROGRAMOBJECTARBPROC glCreateProgramObjectARB = NULL;
 PFNGLATTACHOBJECTARBPROC glAttachObjectARB = NULL;
 PFNGLLINKPROGRAMARBPROC glLinkProgramARB = NULL;
 PFNGLUSEPROGRAMOBJECTARBPROC glUseProgramObjectARB = NULL;
-PFNGLDELETEPROGRAMPROC glDeleteProgram = NULL;
 PFNGLUNIFORM1IARBPROC glUniform1iARB = NULL;
 PFNGLUNIFORM1FARBPROC glUniform1fARB = NULL;
 PFNGLUNIFORM2FARBPROC glUniform2fARB = NULL;
@@ -50,10 +48,10 @@ PFNGLDETACHOBJECTARBPROC glDetachObjectARB = NULL;
 PFNGLDELETEOBJECTARBPROC glDeleteObjectARB = NULL;
 PFNGLGETOBJECTPARAMETERIVARBPROC glGetObjectParameterivARB = NULL;
 PFNGLGETINFOLOGARBPROC glGetInfoLogARB = NULL;
-PFNGLBLENDFUNCSEPARATEPROC glBlendFuncSeparate = NULL;
-PFNGLGENERATEMIPMAPEXTPROC glGenerateMipmap = NULL;
+PFNGLBLENDFUNCSEPARATEEXTPROC glBlendFuncSeparateEXT = NULL;
+PFNGLGENERATEMIPMAPEXTPROC glGenerateMipmapEXT = NULL;
 PFNGLGETATTRIBLOCATIONARBPROC glGetAttribLocationARB = NULL;
-PFNGLVERTEXATTRIB1FPROC glVertexAttrib1fARB = NULL;
+PFNGLVERTEXATTRIB1FARBPROC glVertexAttrib1fARB = NULL;
 
 
 static Bit32s opengl_version = -1;
@@ -184,15 +182,15 @@ bool VOGL_Initialize(void) {
 		return false;
 	}
 
-	glBlendFuncSeparate = (PFNGLBLENDFUNCSEPARATEPROC)SDL_GL_GetProcAddress("glBlendFuncSeparate");
-	if (!glBlendFuncSeparate) {
-		LOG_MSG("opengl: glBlendFuncSeparate extension not supported");
+	glBlendFuncSeparateEXT = (PFNGLBLENDFUNCSEPARATEEXTPROC)SDL_GL_GetProcAddress("glBlendFuncSeparateEXT");
+	if (!glBlendFuncSeparateEXT) {
+		LOG_MSG("opengl: glBlendFuncSeparateEXT extension not supported");
 		return false;
 	}
 
-	glGenerateMipmap = (PFNGLGENERATEMIPMAPEXTPROC)SDL_GL_GetProcAddress("glGenerateMipmap");
-	if (!glGenerateMipmap) {
-		LOG_MSG("opengl: glGenerateMipmap extension not supported");
+	glGenerateMipmapEXT = (PFNGLGENERATEMIPMAPEXTPROC)SDL_GL_GetProcAddress("glGenerateMipmapEXT");
+	if (!glGenerateMipmapEXT) {
+		LOG_MSG("opengl: glGenerateMipmapEXT extension not supported");
 		return false;
 	}
 
@@ -222,9 +220,6 @@ bool VOGL_Initialize(void) {
 
 				glUseProgramObjectARB = (PFNGLUSEPROGRAMOBJECTARBPROC)SDL_GL_GetProcAddress("glUseProgramObjectARB");
 				if (!glUseProgramObjectARB) LOG_MSG("opengl: glUseProgramObjectARB extension not supported");
-
-				glDeleteProgram = (PFNGLDELETEPROGRAMPROC)SDL_GL_GetProcAddress("glDeleteProgram");
-				if (!glDeleteProgram) LOG_MSG("opengl: glDeleteProgram extension not supported");
 
 				glUniform1iARB = (PFNGLUNIFORM1IARBPROC)SDL_GL_GetProcAddress("glUniform1iARB");
 				if (!glUniform1iARB) LOG_MSG("opengl: glUniform1iARB extension not supported");
@@ -259,7 +254,7 @@ bool VOGL_Initialize(void) {
 				glGetAttribLocationARB = (PFNGLGETATTRIBLOCATIONARBPROC)SDL_GL_GetProcAddress("glGetAttribLocationARB");
 				if (!glGetAttribLocationARB) LOG_MSG("opengl: glGetAttribLocationARB extension not supported");
 			
-				glVertexAttrib1fARB = (PFNGLVERTEXATTRIB1FPROC)SDL_GL_GetProcAddress("glVertexAttrib1fARB");
+				glVertexAttrib1fARB = (PFNGLVERTEXATTRIB1FARBPROC)SDL_GL_GetProcAddress("glVertexAttrib1fARB");
 				if (!glVertexAttrib1fARB) LOG_MSG("opengl: glVertexAttrib1fARB extension not supported");
 
 				if (glShaderSourceARB && glCompileShaderARB && glCreateProgramObjectARB &&
@@ -383,7 +378,7 @@ void VOGL_SetAlphaMode(Bit32s enabled_mode,GLuint src_rgb_fac,GLuint dst_rgb_fac
 			current_alpha_enabled=1;
 			if ((current_src_rgb_fac!=(Bit32s)src_rgb_fac) || (current_dst_rgb_fac!=(Bit32s)dst_rgb_fac) ||
 				(current_src_alpha_fac!=(Bit32s)src_alpha_fac) || (current_dst_alpha_fac!=(Bit32s)dst_alpha_fac)) {
-				glBlendFuncSeparate(src_rgb_fac, dst_rgb_fac, src_alpha_fac, dst_alpha_fac);
+				glBlendFuncSeparateEXT(src_rgb_fac, dst_rgb_fac, src_alpha_fac, dst_alpha_fac);
 				current_src_rgb_fac=(Bit32s)src_rgb_fac;
 				current_dst_rgb_fac=(Bit32s)dst_rgb_fac;
 				current_src_alpha_fac=(Bit32s)src_alpha_fac;
@@ -398,7 +393,7 @@ void VOGL_SetAlphaMode(Bit32s enabled_mode,GLuint src_rgb_fac,GLuint dst_rgb_fac
 			if ((current_src_rgb_fac!=(Bit32s)src_rgb_fac) || (current_dst_rgb_fac!=(Bit32s)dst_rgb_fac) ||
 				(current_src_alpha_fac!=(Bit32s)src_alpha_fac) || (current_dst_alpha_fac!=(Bit32s)dst_alpha_fac)) {
 				VOGL_ClearBeginMode();
-				glBlendFuncSeparate(src_rgb_fac, dst_rgb_fac, src_alpha_fac, dst_alpha_fac);
+				glBlendFuncSeparateEXT(src_rgb_fac, dst_rgb_fac, src_alpha_fac, dst_alpha_fac);
 				current_src_rgb_fac=(Bit32s)src_rgb_fac;
 				current_dst_rgb_fac=(Bit32s)dst_rgb_fac;
 				current_src_alpha_fac=(Bit32s)src_alpha_fac;

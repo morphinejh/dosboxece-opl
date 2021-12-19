@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2002-2013  The DOSBox Team
+ *  Copyright (C) 2002-2011  The DOSBox Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -213,7 +213,7 @@ static void Voodoo_UpdateScreen(void) {
 		if (v->ogl) {
 			v->ogl_dimchange = false;
 		} else {
-			RENDER_SetSize(v->fbi.width, v->fbi.height, 16, vdraw.vfreq, 4.0/3.0, false, false);
+			RENDER_SetSize(v->fbi.width, v->fbi.height, 16, 1000.0f / vdraw.vfreq, 4.0/3.0, false, false);
 		}
 
 		Voodoo_VerticalTimer(0);
@@ -301,7 +301,9 @@ void Voodoo_PCI_InitEnable(Bitu val) {
 
 void Voodoo_PCI_Enable(bool enable) {
 	v->clock_enabled = enable;
+//	CPU_Core_Dyn_X86_SaveDHFPUState();
 	Voodoo_UpdateScreenStart();
+//	CPU_Core_Dyn_X86_RestoreDHFPUState();
 }
 
 PageHandler* Voodoo_GetPageHandler() {
