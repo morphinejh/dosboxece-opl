@@ -157,7 +157,7 @@ static Bitu Normal_Loop(void) {
 
 //For trying other delays
 #define wrap_delay(a) SDL_Delay(a)
-
+opl3duo
 void increaseticks() { //Make it return ticksRemain and set it in the function above to remove the global variable.
 	if (GCC_UNLIKELY(ticksLocked)) { // For Fast Forward Mode
 		ticksRemain=5;
@@ -730,7 +730,7 @@ void DOSBOX_Init(void) {
 	Pstring->Set_help(
 		"Parallel or Serial port of the OPL2/3 audio board only\n"
 		"Examples: ttyACM0, ttyS0, parport0, etc\n"
-		"only valid if oplemu=opl2board, opl3duo, opl2lpt, opl3lpt\n"
+		"only valid if oplemu=opl2board, opl3duoboard, opl2lpt, opl3lpt\n"
 		"When any opl2 only device is selected, opl2mode is\n"
 		"automatically set to opl2.");
 
