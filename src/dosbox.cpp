@@ -157,6 +157,7 @@ static Bitu Normal_Loop(void) {
 
 //For trying other delays
 #define wrap_delay(a) SDL_Delay(a)
+
 void increaseticks() { //Make it return ticksRemain and set it in the function above to remove the global variable.
 	if (GCC_UNLIKELY(ticksLocked)) { // For Fast Forward Mode
 		ticksRemain=5;
