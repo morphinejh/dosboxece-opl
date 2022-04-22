@@ -1,6 +1,6 @@
 dnl Init.
-AC_INIT(dosbox,ECE-OPL)
-AC_PREREQ(2.50)
+AC_INIT([dosbox],[ECE-OPL])
+AC_PREREQ([2.71])
 AC_CONFIG_SRCDIR(README)
 
 dnl Detect the canonical host and target build environment
@@ -9,7 +9,7 @@ AC_CANONICAL_BUILD
 
 dnl Setup for automake
 AM_INIT_AUTOMAKE([subdir-objects])
-AC_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS([config.h])
 
 dnl Checks for programs.
 AC_PROG_MAKE_SET
@@ -218,7 +218,7 @@ esac
 
 dnl enable disable alsa and pass it's cflags to CXXFLAGS
 AC_ARG_ENABLE(alsa-midi,
-AC_HELP_STRING([--enable-alsa-midi],[compile with alsa midi support (default yes)]),
+AS_HELP_STRING([--enable-alsa-midi],[compile with alsa midi support (default yes)]),
 [ case "${enableval}" in
  yes) alsa_midi=true;;
  no)  alsa_midi=false;;
@@ -235,7 +235,7 @@ AC_C_BIGENDIAN
 #Features to enable/disable
 AH_TEMPLATE(C_DEBUG,[Define to 1 to enable internal debugger, requires libcurses])
 AH_TEMPLATE(C_HEAVY_DEBUG,[Define to 1 to enable heavy debugging, also have to enable C_DEBUG])
-AC_ARG_ENABLE(debug,AC_HELP_STRING([--enable-debug],[Enable debug mode]),[
+AC_ARG_ENABLE(debug,AS_HELP_STRING([--enable-debug],[Enable debug mode]),[
    AC_CHECK_HEADER(curses.h,have_curses_h=yes,)
    AC_CHECK_LIB(curses, initscr, have_curses_lib=yes, , )
    AC_CHECK_LIB(ncurses, initscr, have_ncurses_lib=yes, , )
@@ -270,7 +270,7 @@ AC_ARG_ENABLE(debug,AC_HELP_STRING([--enable-debug],[Enable debug mode]),[
 ],)
 
 AH_TEMPLATE(C_CORE_INLINE,[Define to 1 to use inlined memory functions in cpu core])
-AC_ARG_ENABLE(core-inline,AC_HELP_STRING([--disable-core-inline],[Disable inlined memory handling in CPU Core]),,enable_core_inline=yes)
+AC_ARG_ENABLE(core-inline,AS_HELP_STRING([--disable-core-inline],[Disable inlined memory handling in CPU Core]),,enable_core_inline=yes)
 AC_MSG_CHECKING(whether memory handling in the CPU Core will be inlined)
 if test x$enable_core_inline = xyes ; then
     AC_MSG_RESULT(yes)
@@ -362,10 +362,10 @@ case "$host" in
    ;;
 esac
 
-AC_ARG_ENABLE(dynamic-core,AC_HELP_STRING([--disable-dynamic-core],[Disable all dynamic cores]),,enable_dynamic_core=yes)
+AC_ARG_ENABLE(dynamic-core,AS_HELP_STRING([--disable-dynamic-core],[Disable all dynamic cores]),,enable_dynamic_core=yes)
 
 AH_TEMPLATE(C_DYNAMIC_X86,[Define to 1 to use x86/x64 dynamic cpu core])
-AC_ARG_ENABLE(dynamic-x86,AC_HELP_STRING([--disable-dynamic-x86],[Disable x86/x64 dynamic cpu core]),,enable_dynamic_x86=yes)
+AC_ARG_ENABLE(dynamic-x86,AS_HELP_STRING([--disable-dynamic-x86],[Disable x86/x64 dynamic cpu core]),,enable_dynamic_x86=yes)
 AC_MSG_CHECKING(whether x86 dynamic cpu core will be enabled) 
 if test x$enable_dynamic_x86 = xno -o x$enable_dynamic_core = xno; then 
    AC_MSG_RESULT(no)
@@ -379,7 +379,7 @@ else
 fi
 
 AH_TEMPLATE(C_DYNREC,[Define to 1 to use recompiling cpu core. Can not be used together with the dynamic-x86 core])
-AC_ARG_ENABLE(dynrec,AC_HELP_STRING([--disable-dynrec],[Disable recompiling cpu core]),,enable_dynrec=yes)
+AC_ARG_ENABLE(dynrec,AS_HELP_STRING([--disable-dynrec],[Disable recompiling cpu core]),,enable_dynrec=yes)
 AC_MSG_CHECKING(whether recompiling cpu core will be enabled) 
 if test x$enable_dynrec = xno -o x$enable_dynamic_core = xno; then 
    AC_MSG_RESULT(no)
@@ -403,7 +403,7 @@ dnl x86 only enable it if dynamic-x86 is disabled.
 fi
 
 AH_TEMPLATE(C_FPU,[Define to 1 to enable floating point emulation])
-AC_ARG_ENABLE(fpu,AC_HELP_STRING([--disable-fpu],[Disable fpu support]),,enable_fpu=yes)
+AC_ARG_ENABLE(fpu,AS_HELP_STRING([--disable-fpu],[Disable fpu support]),,enable_fpu=yes)
 AC_MSG_CHECKING(whether fpu emulation will be enabled) 
 if test x$enable_fpu = xyes ; then 
   AC_MSG_RESULT(yes)
@@ -413,8 +413,8 @@ else
 fi 
 
 AH_TEMPLATE(C_FPU_X86,[Define to 1 to use a x86/x64 assembly fpu core])
-AC_ARG_ENABLE(fpu-x86,AC_HELP_STRING([--disable-fpu-x86],[Disable x86 assembly fpu core]),,enable_fpu_x86=yes)
-AC_ARG_ENABLE(fpu-x64,AC_HELP_STRING([--disable-fpu-x64],[Disable x64 assembly fpu core]),,enable_fpu_x64=yes)
+AC_ARG_ENABLE(fpu-x86,AS_HELP_STRING([--disable-fpu-x86],[Disable x86 assembly fpu core]),,enable_fpu_x86=yes)
+AC_ARG_ENABLE(fpu-x64,AS_HELP_STRING([--disable-fpu-x64],[Disable x64 assembly fpu core]),,enable_fpu_x64=yes)
 AC_MSG_CHECKING(whether the x86/x64 assembly fpu core will be enabled) 
 if test x$enable_fpu_x86 = xno -o x$enable_fpu_x64 = xno; then 
    AC_MSG_RESULT(no)
@@ -432,7 +432,7 @@ else
 fi
 
 AH_TEMPLATE(C_UNALIGNED_MEMORY,[Define to 1 to use a unaligned memory access])
-AC_ARG_ENABLE(unaligned_memory,AC_HELP_STRING([--disable-unaligned-memory],[Disable unaligned memory access]),,enable_unaligned_memory=yes)
+AC_ARG_ENABLE(unaligned_memory,AS_HELP_STRING([--disable-unaligned-memory],[Disable unaligned memory access]),,enable_unaligned_memory=yes)
 AC_MSG_CHECKING(whether to enable unaligned memory access) 
 if test x$enable_unaligned_memory = xyes -a x$c_unalignedmemory = xyes; then 
   AC_DEFINE(C_UNALIGNED_MEMORY,1)
@@ -442,7 +442,7 @@ else
 fi
 
 AH_TEMPLATE(C_SSHOT,[Define to 1 to enable screenshots, requires libpng])
-AC_ARG_ENABLE(screenshots,AC_HELP_STRING([--disable-screenshots],[Disable screenshots]),enable_screenshots=no,enable_screenshots=yes)
+AC_ARG_ENABLE(screenshots,AS_HELP_STRING([--disable-screenshots],[Disable screenshots]),enable_screenshots=no,enable_screenshots=yes)
 AC_CHECK_HEADER(png.h,have_png_h=yes,have_png_h=no)
 AC_CHECK_LIB(png, png_get_io_ptr, have_png_lib=yes, have_png_lib=no,-lz)
 AC_MSG_CHECKING([whether screenshots will be enabled])
@@ -470,7 +470,7 @@ else
 fi
 
 AH_TEMPLATE(C_SRECORD,[Define to 1 to enable movie recording, requires zlib built without Z_SOLO])
-AC_ARG_ENABLE(recording,AC_HELP_STRING([--disable-recording],[Disable movie recording]),,enable_recording=yes)
+AC_ARG_ENABLE(recording,AS_HELP_STRING([--disable-recording],[Disable movie recording]),,enable_recording=yes)
 AC_CHECK_HEADER(zlib.h,have_zlib_h=yes)
 AC_CHECK_LIB(z,compress,have_z_lib=yes,,)
 AC_MSG_CHECKING([whether recording will be enabled])
@@ -545,7 +545,7 @@ AH_TEMPLATE(C_OPENGL,[Define to 1 to use opengl display output support])
 AC_CHECK_LIB(GL, main, have_gl_lib=yes, have_gl_lib=no , )
 AC_CHECK_LIB(opengl32, main, have_opengl32_lib=yes,have_opengl32_lib=no , )
 AC_CHECK_HEADER(GL/gl.h, have_gl_h=yes , have_gl_h=no , )
-AC_ARG_ENABLE(opengl,AC_HELP_STRING([--disable-opengl],[Disable opengl support]),,enable_opengl=yes)
+AC_ARG_ENABLE(opengl,AS_HELP_STRING([--disable-opengl],[Disable opengl support]),,enable_opengl=yes)
 AC_MSG_CHECKING(whether opengl display output will be enabled) 
 if test x$enable_opengl = xyes; then
 case "$host" in
@@ -573,7 +573,7 @@ else
 fi
 
 AH_TEMPLATE(C_DDRAW,[Define to 1 to enable output=ddraw (Win32)])
-AC_ARG_ENABLE(ddraw,AC_HELP_STRING([--disable-ddraw],[Disable ddraw support]),,enable_ddraw=yes)
+AC_ARG_ENABLE(ddraw,AS_HELP_STRING([--disable-ddraw],[Disable ddraw support]),,enable_ddraw=yes)
 AC_CHECK_HEADER(ddraw.h, have_ddraw_h=yes , have_ddraw_h=no , )
 AC_MSG_CHECKING(whether ddraw display output will be enabled)
 if test x$enable_ddraw = xyes; then
