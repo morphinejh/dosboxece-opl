@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2002-2011  The DOSBox Team
+ *  Copyright (C) 2002-2013  The DOSBox Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -479,7 +479,7 @@ void ogl_cache_texture(const poly_extra_data *extra, ogl_texture_data *td) {
 				glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,TEXMODE_CLAMP_S(TEXMODE)?GL_CLAMP_TO_EDGE:GL_REPEAT);
 				glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,TEXMODE_CLAMP_T(TEXMODE)?GL_CLAMP_TO_EDGE:GL_REPEAT);
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, smax, tmax, 0, GL_BGRA_EXT, GL_UNSIGNED_INT_8_8_8_8_REV, texrgbp);
-				glGenerateMipmapEXT(GL_TEXTURE_2D);
+				glGenerateMipmap(GL_TEXTURE_2D);
 				UINT32 palsum=0;
 				if ((TEXMODE_FORMAT(v->tmu[j].reg[textureMode].u)==0x05) || (TEXMODE_FORMAT(v->tmu[j].reg[textureMode].u)==0x0e)) {
 					palsum = calculate_palsum(j);
@@ -1294,7 +1294,6 @@ void voodoo_ogl_texture_clear(UINT32 texbase, int TMU) {
 		} else {
 			t->second.valid_data = false;
 		}
-		glDeleteTextures(1, (GLuint*)&t->second.current_id);
 		textures[TMU].erase(t);
 	}
 }
@@ -1580,6 +1579,31 @@ void voodoo_ogl_set_window(voodoo_state *v) {
 	}
 }
 
+static void voodoo_ogl_init_attribute(bool *has_alpha, bool *has_stencil)
+{
+	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+
+        *has_alpha = true;
+	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+
+        *has_stencil = true;
+	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+#if defined (WIN32) && SDL_VERSION_ATLEAST(1, 2, 11)
+	SDL_GL_SetAttribute( SDL_GL_SWAP_CONTROL, 0 );
+#endif
+#if !defined (WIN32) && SDL_VERSION_ATLEAST(1, 2, 10)
+	// broken on windows (longstanding SDL bug), may help other platforms to force hardware acceleration
+	SDL_GL_SetAttribute( SDL_GL_ACCELERATED_VISUAL, 1 );
+#endif
+
+}
+
+SDL_Surface* SDL_SetVideoMode_Wrap(int width,int height,int bpp,Bit32u flags);
 void voodoo_ogl_reset_videomode(void) {
 	last_clear_color=0;
 
@@ -1593,28 +1617,9 @@ void voodoo_ogl_reset_videomode(void) {
 
 	bool full_sdl_restart = true;	// make dependent on surface=opengl
 
-	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+	bool has_alpha, has_stencil;
 
-	bool has_alpha = true;
-	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
-
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-
-	bool has_stencil = true;
-	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-
-#if defined (WIN32) && SDL_VERSION_ATLEAST(1, 2, 11)
-	SDL_GL_SetAttribute( SDL_GL_SWAP_CONTROL, 0 );
-#endif
-
-#if !defined (WIN32) && SDL_VERSION_ATLEAST(1, 2, 10)
-	// broken on windows (longstanding SDL bug), may help other platforms to force hardware acceleration
-	SDL_GL_SetAttribute( SDL_GL_ACCELERATED_VISUAL, 1 );
-#endif
+        voodoo_ogl_init_attribute(&has_alpha, &has_stencil);
 
 	if (ogl_surface != NULL) {
 		SDL_FreeSurface(ogl_surface);
@@ -1628,7 +1633,12 @@ void voodoo_ogl_reset_videomode(void) {
 	if (GFX_IsFullscreen()) {
 		sdl_flags |= SDL_FULLSCREEN;
 	} else {
-		ogl_surface = SDL_SetVideoMode(v->fbi.width, v->fbi.height, 32, sdl_flags);
+		if (full_sdl_restart) {
+			SDL_QuitSubSystem(SDL_INIT_VIDEO);
+			SDL_InitSubSystem(SDL_INIT_VIDEO);
+                        voodoo_ogl_init_attribute(&has_alpha, &has_stencil);
+		}
+		ogl_surface = SDL_SetVideoMode_Wrap(v->fbi.width, v->fbi.height, 32, sdl_flags);
 	}
 
 	if ((ogl_surface != NULL) && (sdl_flags & SDL_FULLSCREEN)) SDL_Delay(500);
@@ -1637,18 +1647,19 @@ void voodoo_ogl_reset_videomode(void) {
 		if (full_sdl_restart) {
 			SDL_QuitSubSystem(SDL_INIT_VIDEO);
 			SDL_InitSubSystem(SDL_INIT_VIDEO);
-			ogl_surface = SDL_SetVideoMode(v->fbi.width, v->fbi.height, 32, sdl_flags);
+                        voodoo_ogl_init_attribute(&has_alpha, &has_stencil);
+			ogl_surface = SDL_SetVideoMode_Wrap(v->fbi.width, v->fbi.height, 32, sdl_flags);
 		}
 		if (ogl_surface == NULL) {
 			has_alpha = false;
 			SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
-			if (SDL_SetVideoMode(v->fbi.width, v->fbi.height, 32, sdl_flags) == 0) {
+			if (SDL_SetVideoMode_Wrap(v->fbi.width, v->fbi.height, 32, sdl_flags) == 0) {
 				has_stencil = false;
 				SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 0);
-				if (SDL_SetVideoMode(v->fbi.width, v->fbi.height, 32, sdl_flags) == 0) {
+				if (SDL_SetVideoMode_Wrap(v->fbi.width, v->fbi.height, 32, sdl_flags) == 0) {
 					if (sdl_flags & SDL_FULLSCREEN) {
 						sdl_flags &= ~(SDL_FULLSCREEN);
-						if (SDL_SetVideoMode(v->fbi.width, v->fbi.height, 32, sdl_flags) == 0) {
+						if (SDL_SetVideoMode_Wrap(v->fbi.width, v->fbi.height, 32, sdl_flags) == 0) {
 							E_Exit("VOODOO: opengl init error");
 						}
 					} else {
@@ -1721,12 +1732,6 @@ void voodoo_ogl_update_dimensions(void) {
 }
 
 bool voodoo_ogl_init(voodoo_state *v) {
-	extern void CPU_Core_Dyn_X86_SetFPUMode(bool dh_fpu);
-//	CPU_Core_Dyn_X86_SetFPUMode(false);
-
-	extern void CPU_Core_Dyn_X86_Cache_Reset(void);
-//	CPU_Core_Dyn_X86_Cache_Reset();
-
 
 	voodoo_ogl_reset_videomode();
 
@@ -1797,7 +1802,7 @@ void voodoo_ogl_leave(bool leavemode) {
 					if (info->so_fragment_shader >= 0) glDetachObjectARB(info->so_shader_program, info->so_fragment_shader);
 					if (info->so_vertex_shader >= 0) glDeleteObjectARB(info->so_vertex_shader);
 					if (info->so_fragment_shader >= 0) glDeleteObjectARB(info->so_fragment_shader);
-					glDeleteObjectARB(info->so_shader_program);
+					glDeleteProgram(info->so_shader_program);
 				}
 
 				info->shader_ready=false;

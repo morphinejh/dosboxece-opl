@@ -51,7 +51,7 @@ dnl Now check if the installed SDL is sufficiently new. (Also sanity
 dnl checks the results of sdl-config to some extent
 dnl
       rm -f conf.sdltest
-      AC_RUN_IFELSE([AC_LANG_SOURCE([[
+      AC_TRY_RUN([
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -108,7 +108,7 @@ int main (int argc, char *argv[])
     }
 }
 
-]])],[],[no_sdl=yes],[echo $ac_n "cross compiling; assumed OK... $ac_c"])
+],, no_sdl=yes,[echo $ac_n "cross compiling; assumed OK... $ac_c"])
        CFLAGS="$ac_save_CFLAGS"
        LIBS="$ac_save_LIBS"
      fi
@@ -130,10 +130,11 @@ int main (int argc, char *argv[])
           echo "*** Could not run SDL test program, checking why..."
           CFLAGS="$CFLAGS $SDL_CFLAGS"
           LIBS="$LIBS $SDL_LIBS"
-          AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+          AC_TRY_LINK([
 #include <stdio.h>
 #include "SDL.h"
-]], [[ return 0; ]])],[ echo "*** The test program compiled, but did not run. This usually means"
+],      [ return 0; ],
+        [ echo "*** The test program compiled, but did not run. This usually means"
           echo "*** that the run-time linker is not finding SDL or finding the wrong"
           echo "*** version of SDL. If it is not finding SDL, you'll need to set your"
           echo "*** LD_LIBRARY_PATH environment variable, or edit /etc/ld.so.conf to point"
@@ -141,7 +142,8 @@ int main (int argc, char *argv[])
           echo "*** is required on your system"
 	  echo "***"
           echo "*** If you have an old version installed, it is best to remove it, although"
-          echo "*** you may also be able to get things to work by modifying LD_LIBRARY_PATH"],[ echo "*** The test program failed to compile or link. See the file config.log for the"
+          echo "*** you may also be able to get things to work by modifying LD_LIBRARY_PATH"],
+        [ echo "*** The test program failed to compile or link. See the file config.log for the"
           echo "*** exact error that occurred. This usually means SDL was incorrectly installed"
           echo "*** or that you have moved SDL since it was installed. In the latter case, you"
           echo "*** may want to edit the sdl-config script: $SDL_CONFIG" ])
@@ -232,10 +234,10 @@ no_alsa=""
            sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\3/'`
 
 AC_LANG_SAVE
-AC_LANG([C])
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+AC_LANG_C
+AC_TRY_COMPILE([
 #include <alsa/asoundlib.h>
-]], [[
+], [
 /* ensure backward compatibility */
 #if !defined(SND_LIB_MAJOR) && defined(SOUNDLIB_VERSION_MAJOR)
 #define SND_LIB_MAJOR SOUNDLIB_VERSION_MAJOR
@@ -267,10 +269,12 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #    endif
 #  endif
 exit(0);
-]])],[AC_MSG_RESULT(found.)],[AC_MSG_RESULT(not present.)
+],
+  [AC_MSG_RESULT(found.)],
+  [AC_MSG_RESULT(not present.)
    ifelse([$3], , [AC_MSG_ERROR(Sufficiently new version of libasound not found.)])
-   alsa_found=no
-])
+   alsa_found=no]
+)
 AC_LANG_RESTORE
 
 dnl Now that we know that we have the right version, let's see if we have the library and not just the headers.
