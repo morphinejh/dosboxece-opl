@@ -86,7 +86,7 @@ public:
 		fluid_settings_setnum(settings, "synth.sample-rate", atof(section->Get_string("fluid.samplerate")));
 		fluid_settings_setnum(settings, "synth.gain", atof(section->Get_string("fluid.gain")));		
 		fluid_settings_setint(settings, "synth.polyphony", section->Get_int("fluid.polyphony"));
-		if (strcmp(section->Get_string("fluid.driver"),"default") != 0) {
+		if (strcmp(section->Get_string("fluid.cores"),"default") != 0) {
 			fluid_settings_setint(settings, "synth.cpu-cores", atof(section->Get_string("fluid.cores")));
 		}
 		fluid_settings_setint(settings, "audio.periods", atof(section->Get_string("fluid.periods")));
