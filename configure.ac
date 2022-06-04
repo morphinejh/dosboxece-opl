@@ -1,6 +1,6 @@
 dnl Init.
-AC_INIT(dosbox,ECE-OPL)
-AC_PREREQ(2.71)
+AC_INIT([dosbox],[ECE-OPL])
+AC_PREREQ([2.71])
 AC_CONFIG_SRCDIR(README)
 
 dnl Detect the canonical host and target build environment
