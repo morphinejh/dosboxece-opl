@@ -33,7 +33,9 @@ Future plans are to also incorporate the use of a FTDI - FT232H USB allowing for
   * https://vincent.bernat.ch/en/blog/2018-opl2-audio-board
 * tio - Simple TTY terminal
   * https://github.com/tio/tio
- 
+* Voyageur's OpenGLIDE mirror
+  * https://github.com/voyageur/openglide
+  
 #### Reference Hardware:
 
 * OPL2LPT and OPL3LPT devices
