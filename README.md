@@ -1,9 +1,6 @@
 # dosboxece-opl
 DosBoxECE with a hardware OPL implementation for OPL2LPT, OPL3LPT, OPL2 Audio and OPL3 Duo! support.
 
-## Work In Progress
-This project is still a work in progress. That said, it should compile and work if all dependencies are met.
-
 ### Required libraries
 The following librariers are required in addition to those required to build DOSBoxECE vanilla.
  
