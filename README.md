@@ -31,6 +31,7 @@ Future plans are to also incorporate the use of a FTDI - FT232H USB allowing for
 * tio - Simple TTY terminal
   * https://github.com/tio/tio
 * OpenGLIDE now moved to github
+  * https://github.com/voyageur/openglide
   * https://github.com/fcbarros/openglide
   
 #### Reference Hardware:
