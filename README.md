@@ -8,10 +8,10 @@ The following librariers are required in addition to those required to build DOS
 
 The current build target is Linux only. This is mainly due to the parallel port requirement.
 
-### TODO
-OPL over the LPT port doesn't seem to have many issues. However, there are some hardware combinations of microcontrollers and USB controllers that can cause delays, stutters, or loss of audio due to the use of the serial connection and throughput needed.
-
-Future plans are to also incorporate the use of a FTDI - FT232H USB allowing for general purpose USB to GPIO, SPI, or I2C for lower latency along with higher throughput.
+### End of life for DOSBox ECE
+https://www.vogons.org/viewtopic.php?p=1192987#p1192987
+### Future of DOSbox ECE-OPL
+Unknown at this time. I may switch to DOSBox Staging / DOSBox-X or I may update directly from SVN channges. There is a possiblity let it retire.
 
 #### Reference Source code and/or inspiration:
 
