@@ -16,7 +16,8 @@ Unknown at this time. I may switch to DOSBox Staging / DOSBox-X or I may update 
 #### Reference Source code and/or inspiration:
 
 * DosBox Enhanced Community Edition
-  * https://yesterplay.net/dosboxece/
+  * Original URL now offline
+  * ```https://yesterplay.net/dosboxece/```
 * OPL2 Audio and OPL3 Duo! Source
   * https://github.com/DhrBaksteen/ArduinoOPL2
 * Munt MT-32 emulator
